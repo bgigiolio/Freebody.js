@@ -18,7 +18,8 @@ inclinedPlane.prototype = {
         slopeInput: null,
         slopeButton: null,
         heightInput: null,
-        heightButton: null},
+        heightButton: null,
+        errorText: null},
 
     generate: function(slopeAngle = this.slopeAngle, y_height = this.height){
         if(isNaN(slopeAngle) || isNaN(y_height)){
@@ -86,31 +87,39 @@ inclinedPlane.prototype = {
         self.slopeAngle = slopeAngle
         self.generate()
     },
-    generateInputArea: function(){//helper
+    generateInputArea: function(){//internal helper
         this.inputContainer.inputArea = document.createElement("div");
         this.inputContainer.inputArea.id = "input"
+        this.inputContainer.errorText = document.createElement("span")
+        this.inputContainer.errorText.appendChild(document.createTextNode(""))
+        this.inputContainer.errorText.style.color = "red";
+        this.inputContainer.inputArea.appendChild(this.inputContainer.errorText)
+        let br = document.createElement("br");
+        this.inputContainer.inputArea.appendChild(br);
         this.div.appendChild(this.inputContainer.inputArea)
     },
-    updateSlopeInput: function(self){
+    updateSlopeInput: function(self){//internal helper
         let val = parseInt(self.inputContainer.slopeInput.value)
         if(isNaN(val)){
-            log("invalid input")
+            self.inputContainer.errorText.innerHTML="Slope must be a number"
         }
         else if(val >= 90 || val <= 0){
-            log("invalid input")
+            self.inputContainer.errorText.innerHTML="Slope must be between 1 and 89 degrees"
         }else{
+            self.inputContainer.errorText.innerHTML=""
             self.setSlopeAngle(val, self)
         }
     },
-    updateHeightInput: function(self){
+    updateHeightInput: function(self){//internal helper
         let val = parseInt(self.inputContainer.heightInput.value)
         if(isNaN(val)){
-            log("invalid input")
+            self.inputContainer.errorText.innerHTML="Height must be a number"
         }
         else if( val <= 0){
-            log("invalid input")
+            self.inputContainer.errorText.innerHTML="Height must be positive"
         }else{
             self.setHeight(val, self)
+            self.inputContainer.errorText.innerHTML=""
         }
     },
     allowSlopeInput: function(){
