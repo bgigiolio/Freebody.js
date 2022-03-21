@@ -104,7 +104,10 @@ inclinedPlane.prototype = {
         }
         
         let context = self.canvas.getContext('2d')
-        this.base_y += (Math.abs(box_tr.y) + 1)
+        log(this.height + Math.abs(box_tr.y) + 1)
+        if(this.base_y < (Math.abs(box_tr.y) + 1)){
+            this.base_y += (Math.abs(box_tr.y) + 1)
+        }
         // this.base_x += (Math.abs(box_tl.x) + 1)
         this.generate()
         context.beginPath();
