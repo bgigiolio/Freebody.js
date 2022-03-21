@@ -11,7 +11,7 @@ inclinedPlane.prototype = {
     base_x: 0,
     base_y: 0,
     width: 0,
-    height: 200,
+    height: 70,
     slopeAngle: 30,
     div: null,
     inputContainer : {    
