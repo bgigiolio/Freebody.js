@@ -7,6 +7,8 @@ function inclinedPlane(){
 
 inclinedPlane.prototype = {
     canvas: null,
+    canvasWidth: 0,
+    canvasHeight: 0,
     base_x: 0,
     base_y: 0,
     width: 0,
@@ -46,13 +48,15 @@ inclinedPlane.prototype = {
         let context = this.canvas.getContext('2d');
         
         this.height = y_height
-        let slopeAngleRads = this.slopeAngle * (Math.PI / 180)
+        let slopeAngleRads = this.convertToRadians(this.slopeAngle)
         let height = y_height + this.base_y
-        this.width = height / Math.tan(slopeAngleRads)
+        this.width = this.height / Math.tan(slopeAngleRads)
         let width = this.width + this.base_x
-        // let rads = slopeAngleRads * (Math.PI / 180) + Math.PI
         context.canvas.width = width
+        this.canvasWidth = width
         context.canvas.height = height + 3
+        this.canvasHeight = height + 3
+
         log("height = " + (height - this.base_y))
         log("width = " + (width - this.base_x))
 
@@ -71,12 +75,58 @@ inclinedPlane.prototype = {
         }
 
     },
+    addForceObject: function(type, self=this){
+        if(type.toLowerCase() === "box" || type.toLowerCase() === "square" ){
+            self.generateBox(self)
+        }else if(type.toLowerCase() === "circle" || type.toLowerCase() === "sphere" || type.toLowerCase() === "wheel" ){
+            self.generateCircle(self)
+        }else{
+            self.inputContainer.errorText.innerHTML = "Object type must be either box or circle"
+        }
+
+    },
+    generateBox: function(self=this){//internal helper
+        let hypotenuseLength = Math.sqrt(self.height ** 2 + self.width ** 2)
+        let boxSize = hypotenuseLength / 5
+        let radSlope = self.convertToRadians(self.slopeAngle)
+        let box_br = { //Bottom right
+            x: (hypotenuseLength * 2 / 5) * Math.cos(radSlope),
+            y: (hypotenuseLength * 2 / 5) * Math.sin(radSlope)
+        }
+        let box_bl = { //Bottom left
+            x: (hypotenuseLength * 3 / 5) * Math.cos(radSlope),
+            y: (hypotenuseLength * 3 / 5) * Math.sin(radSlope)
+        }
+        let box_tr = { //Top right
+            x: box_br.x + boxSize * Math.sin(radSlope),
+            y: box_br.y - (boxSize * Math.cos(radSlope))
+        }
+        let box_tl = { //Top left
+            x: box_bl.x + boxSize * Math.sin(radSlope),
+            y: box_bl.y - (boxSize * Math.cos(radSlope))
+        }
+
+        let context = self.canvas.getContext('2d')
+        this.base_y += (Math.abs(box_tr.y) + 1)
+        this.generate()
+        context.beginPath();
+        context.moveTo(box_br.x + this.base_x, box_br.y + this.base_y)
+        context.lineTo(box_tr.x + this.base_x, box_tr.y + this.base_y)
+        context.lineTo(box_tl.x + this.base_x, box_tl.y + this.base_y)
+        context.lineTo(box_bl.x + this.base_x, box_bl.y + this.base_y)
+        context.closePath()
+        context.stroke()
+ 
+    },
+    generateCircle: function(self=this){//internal helper
+
+    },
     setLeftOffset: function(offset){
-        this.base_x = offset
+        this.base_x += offset
         this.generate()
     },
     setUpOffset: function(offset){
-        this.base_y = offset
+        this.base_y += offset
         this.generate()
     },
     setHeight: function(height, self=this){
@@ -169,6 +219,9 @@ inclinedPlane.prototype = {
             let br2 = document.createElement("br");
             this.inputContainer.inputArea.appendChild(br2);
         }
+    },
+    convertToRadians: function(val){//internal helper
+        return val * (Math.PI / 180)
     }
 
 }
