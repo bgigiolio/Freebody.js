@@ -7,8 +7,7 @@ function inclinedPlane(){
 
 inclinedPlane.prototype = {
     canvas: null,
-    canvasWidth: 0,
-    canvasHeight: 0,
+    forceObject: null,
     base_x: 0,
     base_y: 0,
     width: 0,
@@ -53,9 +52,7 @@ inclinedPlane.prototype = {
         this.width = this.height / Math.tan(slopeAngleRads)
         let width = this.width + this.base_x
         context.canvas.width = width
-        this.canvasWidth = width
         context.canvas.height = height + 3
-        this.canvasHeight = height + 3
 
         log("height = " + (height - this.base_y))
         log("width = " + (width - this.base_x))
@@ -105,9 +102,10 @@ inclinedPlane.prototype = {
             x: box_bl.x + boxSize * Math.sin(radSlope),
             y: box_bl.y - (boxSize * Math.cos(radSlope))
         }
-
+        
         let context = self.canvas.getContext('2d')
         this.base_y += (Math.abs(box_tr.y) + 1)
+        // this.base_x += (Math.abs(box_tl.x) + 1)
         this.generate()
         context.beginPath();
         context.moveTo(box_br.x + this.base_x, box_br.y + this.base_y)
@@ -116,6 +114,7 @@ inclinedPlane.prototype = {
         context.lineTo(box_bl.x + this.base_x, box_bl.y + this.base_y)
         context.closePath()
         context.stroke()
+        this.forceObject = "box"
  
     },
     generateCircle: function(self=this){//internal helper
@@ -124,18 +123,30 @@ inclinedPlane.prototype = {
     setLeftOffset: function(offset){
         this.base_x += offset
         this.generate()
+        if(this.forceObject === "box"){
+            this.generateBox()
+        }
     },
     setUpOffset: function(offset){
         this.base_y += offset
         this.generate()
+        if(this.forceObject === "box"){
+            this.generateBox()
+        }
     },
     setHeight: function(height, self=this){
         self.height = height
         self.generate()
+        if(self.forceObject === "box"){
+            self.generateBox()
+        }
     },
     setSlopeAngle: function(slopeAngle, self=this){
         self.slopeAngle = slopeAngle
         self.generate()
+        if(self.forceObject === "box"){
+            self.generateBox()
+        }
     },
     generateInputArea: function(){//internal helper
         this.inputContainer.inputArea = document.createElement("div");
