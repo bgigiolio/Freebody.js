@@ -12,8 +12,11 @@ app.use(express.static(path.join(__dirname, '/pub')))
 app.get('/', (req, res) => {
 	res.sendFile(path.join(__dirname+'/pub/js_libraries.html'));
 })
-app.get('/problem', (req, res) => {
-	res.status(500).send('There was a problem on the server')
+app.get('/examples', (req, res) => {
+	res.sendFile(path.join(__dirname + '/pub/examples.html'))
+})
+app.get('/documentation', (req, res) => {
+	res.sendFile(path.join(__dirname + '/pub/documentation.html'))
 })
 
 const port = process.env.PORT || 5000

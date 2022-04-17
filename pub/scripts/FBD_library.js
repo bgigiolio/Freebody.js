@@ -24,6 +24,7 @@ inclinedPlane.prototype = {
     base_y: 0,
     width: 200,
     height: 70,
+    canvasWidth: 200,
     fontSize: 10,
     slopeAngle: 30,
     hoverColor : "#8ED6FF",
@@ -33,6 +34,7 @@ inclinedPlane.prototype = {
     map : null,
     sizeUnits : null,
     massUnits : null,
+    popup: false,
     planeProperties: {Angle: "30" + "\u00b0"},
     objectProperties: {},
     popupDiv: null,
@@ -45,7 +47,11 @@ inclinedPlane.prototype = {
         errorText: null},
 
     generate: function(slopeAngle = this.slopeAngle, y_height = this.height, fill = false, newRender = true){
+        
         //Error texts
+        window.onresize = function(){
+            this.generate()
+        }.bind(this)
         if(isNaN(slopeAngle) || isNaN(y_height)){
             throw "Slope Angle and Height must be a number"
         }
@@ -58,6 +64,7 @@ inclinedPlane.prototype = {
         }
         //Generates div
         if(!this.div){
+            this[this.name + "planeProperties"] = {}
             this.div = document.createElement("div");
             this.div.id = this.name
             var body = document.getElementsByTagName("body")[0];
@@ -77,10 +84,11 @@ inclinedPlane.prototype = {
         this.base_y = this.height * .5
         // this.base_x = this.fontSize * 5 // CHange??
         let height = y_height + this.base_y
-        this.width = this.height / Math.tan(slopeAngleRads)
+        this.width =this.height / Math.tan(slopeAngleRads)
         let width = this.width + this.base_x
-        context.canvas.width = width
-        context.canvas.height = height * 1.5
+        this.canvasWidth = Math.max(width, this.canvasWidth)
+        context.canvas.width = this.canvasWidth
+        context.canvas.height = height + this.fontSize * 2
         context.beginPath();
         context.moveTo(this.base_x, this.base_y);
         context.lineTo(this.base_x, height);
@@ -98,23 +106,24 @@ inclinedPlane.prototype = {
         this.fontSize = Math.min(width, height) * .09
         context.font = this.fontSize + "px Arial";
         //Angle label
-        context.fillText(this.planeProperties.Angle, width * (3/4) + 2, height - 2);
+        this[this.name + "planeProperties"].Angle =  "30" + "\u00b0";
+        context.fillText(this[this.name + "planeProperties"].Angle, width * (3/4) + 2, height - 2);
         //Width label
-        if(this.planeProperties.hasOwnProperty("Width")){
-            context.fillText(this.planeProperties.Width, width * .3, height + this.fontSize + 2);
+        if(this[this.name + "planeProperties"].hasOwnProperty("Width")){
+            context.fillText(this[this.name + "planeProperties"].Width, width * .3, height + this.fontSize + 2);
         }else
-        if(this.planeProperties.hasOwnProperty("Height")){
-            if(!isNaN(this.planeProperties.Height)){
-                let calcWidth = parseInt(this.planeProperties.Height) / Math.tan(slopeAngleRads)
+        if(this[this.name + "planeProperties"].hasOwnProperty("Height")){
+            if(!isNaN(this[this.name + "planeProperties"].Height)){
+                let calcWidth = parseInt(this[this.name + "planeProperties"].Height) / Math.tan(slopeAngleRads)
                 context.fillText(calcWidth.toPrecision(4) + " " + this.sizeUnits, width * .3, height + this.fontSize + 2);
             }else{
-                context.fillText(this.planeProperties.Height + " / Tan(" + this.planeProperties.Angle + ")", width * .3, height + this.fontSize + 2)
+                context.fillText(this[this.name + "planeProperties"].Height + " / Tan(" + this[this.name + "planeProperties"].Angle + ")", width * .3, height + this.fontSize + 2)
             }
         }
         //Height label
-        if(this.planeProperties.hasOwnProperty("Height")){
+        if(this[this.name + "planeProperties"].hasOwnProperty("Height")){
 
-            context.fillText(this.planeProperties.Height, this.base_x + 2, height * (3/4));
+            context.fillText(this[this.name + "planeProperties"].Height, this.base_x + 2, height * (3/4));
         }
 
         context.stroke();
@@ -137,7 +146,7 @@ inclinedPlane.prototype = {
             let rect = this.canvas.getBoundingClientRect()
             this.mapImage.style.position = "absolute"
             this.mapImage.style.left = rect.left + "px"
-            this.mapImage.style.top = rect.top + "px"
+            this.mapImage.style.top = (rect.top + window.scrollY) + "px"
             this.mapImage.setAttribute("usemap", "#imgMap" + this.name)
             this.map = document.createElement("map")
             this.map.setAttribute("name", "imgMap" + this.name)
@@ -145,17 +154,19 @@ inclinedPlane.prototype = {
             planeArea.setAttribute("shape", "poly")
             planeArea.setAttribute("coords", this.base_x + "," + this.base_y + "," + this.base_x + "," + this.height + "," + width + "," + height)
             planeArea.setAttribute("alt", "plane")
-            planeArea.setAttribute("href", "#")
+            planeArea.setAttribute("href", "javascript:void(0)")
             planeArea.onmouseenter = this.hoverPlane.bind(this)
             planeArea.onmouseleave = this.unHoverPlane.bind(this)
-            planeArea.onclick = this.planeClick.bind(this)
+            if(this.popup){
+                planeArea.onclick = this.planeClick.bind(this)
+            }
             this.map.appendChild(planeArea)
             this.div.appendChild(this.map)
         }
 
 
-        this.div.style.width = Math.max(this.canvas.width, 250) + "px"
-        this.div.style.display = "inline-block"
+        // this.div.style.width = Math.max(this.canvas.width, 250) + "px"
+        // this.div.style.display = "inline-block"
 
         //updates canvas if needed
         if(updateCanvas){
@@ -204,6 +215,12 @@ inclinedPlane.prototype = {
             this.base_y += (Math.abs(box_tr.y) + 1)
         }
         // this.base_x += (Math.abs(box_tl.x) + 1)
+        let halfRightX = ((box_tl.x + this.base_x) + (box_bl.x + this.base_x)) / 2
+        let arrowLength = Math.min(this.height / 2, this.width / 2, ((box_tr.y + this.base_y) + (box_tl.y + this.base_y)) / 2)
+        let halfTopX = ((box_tr.x + this.base_x) + (box_tl.x + this.base_x)) / 2
+        this.canvasWidth = Math.max(halfTopX + arrowLength * Math.sin(radSlope), halfRightX + arrowLength * Math.cos(radSlope), this.width + this.base_x)
+        this.base_y = Math.max(this.base_y, -1 * (((box_tr.y + this.base_y) + (box_tl.y + this.base_y)) / 2 - arrowLength * Math.cos(radSlope)))
+
         if(fill.hasOwnProperty("plane")){
             this.generate(undefined, undefined, true, false)
         }else if (fill.hasOwnProperty("box")){
@@ -212,6 +229,9 @@ inclinedPlane.prototype = {
         else{
             this.generate(undefined, undefined, undefined, true)
         }
+        window.onresize = function(){
+            this.generateBox(this)
+        }.bind(this)
         context.beginPath();
         context.moveTo(box_br.x + this.base_x, box_br.y + this.base_y)
         context.lineTo(box_tr.x + this.base_x, box_tr.y + this.base_y)
@@ -225,11 +245,9 @@ inclinedPlane.prototype = {
             context.fillStyle = this.hoverColor
             context.fill()
         }
-        let arrowLength = Math.min(this.height / 2, this.width / 2, ((box_tr.y + this.base_y) + (box_tl.y + this.base_y)) / 2)
         let head = Math.min(this.height / 5, this.width / 5, 10)
 
         //Right arrow
-        let halfRightX = ((box_tl.x + this.base_x) + (box_bl.x + this.base_x)) / 2
         let halfRightY = ((box_tl.y + this.base_y) + (box_bl.y + this.base_y)) / 2
         if(fill.hasOwnProperty("Right")){
             context.strokeStyle = "#FF0000";
@@ -252,12 +270,10 @@ inclinedPlane.prototype = {
         context.stroke();
         context.strokeStyle = "black"
         //Up arrow
-        let halfTopX = ((box_tr.x + this.base_x) + (box_tl.x + this.base_x)) / 2
-        let halfTopY = ((box_tr.y + this.base_y) + (box_tl.y + this.base_y)) / 2
         if(fill.hasOwnProperty("Normal")){
-            log("Normal")
             context.strokeStyle = "#FF0000";
         }
+        let halfTopY = ((box_tr.y + this.base_y) + (box_tl.y + this.base_y)) / 2
         context.beginPath();
         drawArrow(context, halfTopX, halfTopY, halfTopX + arrowLength * Math.sin(radSlope), halfTopY - arrowLength * Math.cos(radSlope), head)
         context.closePath();
@@ -284,7 +300,7 @@ inclinedPlane.prototype = {
         context.closePath();
         context.stroke();
         context.strokeStyle = "black"
-
+        // this.width = Math.max(halfTopX + arrowLength * Math.sin(radSlope), halfRightX + arrowLength * Math.cos(radSlope))
 
         if(!Object.keys(fill).length){
             
@@ -292,15 +308,18 @@ inclinedPlane.prototype = {
             boxArea.setAttribute("shape", "poly")
             boxArea.setAttribute("coords", (box_br.x + this.base_x) + "," + (box_br.y + this.base_y) + "," + (box_tr.x + this.base_x) + ',' + (box_tr.y + this.base_y) + "," + (box_tl.x + this.base_x) + "," + (box_tl.y + this.base_y) + "," + (box_bl.x + this.base_x) + "," + (box_bl.y + this.base_y))
             boxArea.setAttribute("alt", "box")
-            boxArea.setAttribute("href", "#")
+            boxArea.setAttribute("href", "javascript:void(0)")
             boxArea.style.display = "block"
             boxArea.onmouseenter = this.hoverObject.bind(this)
             boxArea.onmouseleave = this.unHoverObject.bind(this)
-            boxArea.onclick = this.boxClick.bind(this)
+            if(this.popup){
+                boxArea.onclick = this.boxClick.bind(this)
+            }
             this.map.appendChild(boxArea)
         }
         context.stroke()
         this.forceObject = "box"
+        
     },
     generateCircle: function(self=this){//internal helper
 
@@ -340,13 +359,14 @@ inclinedPlane.prototype = {
      * @param {Number} height Value for height
      * @param {String} unit Unit for height
      */
-    setHeight: function(height, unit=""){
-        if(this.popupDiv){
-            this.popupDiv.remove()
-            this.popupDiv = null
+    setHeight: function(height, unit="", self=this){
+        if(self.popupDiv){
+            self.popupDiv.remove()
+            self.popupDiv = null
         }
-        this.sizeUnits = unit
-        this.planeProperties["Height"] = height + " " + unit
+        self.sizeUnits = unit
+        log(self)
+        self[this.name + "planeProperties"]["Height"] = height + " " + unit
     },
 
     /**
@@ -363,7 +383,7 @@ inclinedPlane.prototype = {
         if(self.forceObject === "box"){
             self.generateBox()
         }
-        this.planeProperties["Angle"] = slopeAngle + "\u00b0"
+        this[this.name + "planeProperties"]["Angle"] = slopeAngle + "\u00b0"
     },
 
     /**
@@ -376,7 +396,7 @@ inclinedPlane.prototype = {
             this.popupDiv.remove()
             this.popupDiv = null
         }
-        this.planeProperties[attribute] = value
+        this[this.name + "planeProperties"][attribute] = value
     },
     /**
      * Set the mass of the force object
@@ -422,12 +442,12 @@ inclinedPlane.prototype = {
             this.popupDiv.remove()
             this.popupDiv = null
         }
-        this.planeProperties["Width"] = width
+        this[this.name + "planeProperties"]["Width"] = width
     },
 
     generateInputArea: function(){//internal helper
         this.inputContainer.inputArea = document.createElement("div");
-        this.inputContainer.inputArea.id = "input"
+        this.inputContainer.inputArea.id = this.name + "Input"
         this.inputContainer.errorText = document.createElement("span")
         this.inputContainer.errorText.appendChild(document.createTextNode(""))
         this.inputContainer.errorText.style.color = "red";
@@ -441,8 +461,8 @@ inclinedPlane.prototype = {
         if(isNaN(val)){
             self.inputContainer.errorText.innerHTML="Slope must be a number"
         }
-        else if(val >= 90 || val <= 0){
-            self.inputContainer.errorText.innerHTML="Slope must be between 1 and 89 degrees"
+        else if(val >= 90 || val <= 12){
+            self.inputContainer.errorText.innerHTML="Slope must be between 13 and 89 degrees"
         }else{
             self.inputContainer.errorText.innerHTML=""
             self.setSlopeAngle(val, self)
@@ -476,12 +496,12 @@ inclinedPlane.prototype = {
             this.inputContainer.inputArea.appendChild(br);
             this.inputContainer.slopeInput = document.createElement("input");
             this.inputContainer.slopeInput.setAttribute("type", "text");
-            this.inputContainer.slopeInput.id = "SlopeInput"
+            this.inputContainer.slopeInput.id = this.name + "SlopeInput"
             this.inputContainer.slopeInput.placeholder = "Angle in degrees"
             this.inputContainer.inputArea.appendChild(this.inputContainer.slopeInput)
             this.inputContainer.slopeButton = document.createElement("button")
             this.inputContainer.slopeButton.innerHTML = "update";
-            this.inputContainer.slopeButton.id = "slopeButton"
+            this.inputContainer.slopeButton.id = this.name + "SlopeButton"
             this.inputContainer.inputArea.appendChild(this.inputContainer.slopeButton)
             let self = this
             this.inputContainer.slopeButton.addEventListener("click", function() {self.updateSlopeInput(self);})
@@ -504,12 +524,12 @@ inclinedPlane.prototype = {
             this.inputContainer.inputArea.appendChild(br);
             this.inputContainer.heightInput = document.createElement("input");
             this.inputContainer.heightInput.setAttribute("type", "text");
-            this.inputContainer.heightInput.id = "HeightInput"
+            this.inputContainer.heightInput.id = this.name + "HeightInput"
             this.inputContainer.heightInput.placeholder = "height in pixels"
             this.inputContainer.inputArea.appendChild(this.inputContainer.heightInput)
             this.inputContainer.heightButton = document.createElement("button")
             this.inputContainer.heightButton.innerHTML = "update";
-            this.inputContainer.heightButton.id = "heightButton"
+            this.inputContainer.heightButton.id = this.name + "HeightButton"
             this.inputContainer.inputArea.appendChild(this.inputContainer.heightButton)
             let self = this
             this.inputContainer.heightButton.addEventListener("click", function() {self.updateHeightInput(self);})
@@ -553,7 +573,7 @@ inclinedPlane.prototype = {
         body.appendChild(this.popupDiv);
         let textSpan = document.createElement("span")
 
-        for (const [key, value] of Object.entries(this.planeProperties)) {
+        for (const [key, value] of Object.entries(this[this.name + "planeProperties"])) {
                 let text = document.createTextNode(key + ": " + value)
                 let br2 = document.createElement("br");
                 textSpan.appendChild(text)
@@ -602,8 +622,8 @@ inclinedPlane.prototype = {
         this.popupDiv.style.minHeight = "100px"
         this.popupDiv.style.backgroundColor="#fcf7dc";
         this.popupDiv.style.position = "absolute"
-        this.popupDiv.style.cssFloat = "top";
-        this.popupDiv.style.display = "inline-block"
+        // this.popupDiv.style.cssFloat = "top";
+        // this.popupDiv.style.display = "inline-block"
         this.popupDiv.style.borderRadius = "8%"
         this.popupDiv.style.borderStyle = "solid"
         this.popupDiv.style.borderWidth = "1px"
@@ -668,12 +688,24 @@ inclinedPlane.prototype = {
     hoverForce(type){
         let fill = {}
         fill[type] = true
-        log(fill)
         this.generateBox(undefined, fill)
     },
     unHoverForce(){
-        log("unhover")
         this.generateBox()
+    },
+    allowPopup(){
+        this.popup = true;
+        this.generate(undefined, undefined, undefined, false)
+        if(this.forceObject == "box"){
+            this.generateBox()
+        }
+    },
+    disablePopup(){
+        this.popup = false;
+        this.generate(undefined, undefined, undefined, false)
+        if(this.forceObject == "box"){
+            this.generateBox()
+        }
     }
 }
 
@@ -696,6 +728,7 @@ plane.prototype = {
     popupType : null,
     div: null,
     mapImage : null,
+    popup: false,
     map : null,
     sizeUnits : null,
     massUnits : null,
@@ -709,6 +742,9 @@ plane.prototype = {
         errorText: null},
 
     generate: function(newRender = true){
+        window.onresize = function(){
+            this.generate()
+        }.bind(this)
         //Error texts
         //Generates div
         if(!this.div){
@@ -725,12 +761,12 @@ plane.prototype = {
             this.canvas = document.createElement("CANVAS");
         }
         let context = this.canvas.getContext('2d');
-        this.base_y = this.width * 3/5
+        this.base_y = this.width * 2/5
         // this.base_x = this.fontSize * 5 // CHange??
-        let height = this.width
+        let height = this.width * 4/5
         let width = this.width + this.base_x
-        context.canvas.width = width * 2
-        context.canvas.height = height * 1.2//Change?
+        context.canvas.width = width
+        context.canvas.height = height//Change?
 
         context.beginPath();
         context.moveTo(this.base_x, this.height + this.base_y);
@@ -759,7 +795,7 @@ plane.prototype = {
             let rect = this.canvas.getBoundingClientRect()
             this.mapImage.style.position = "absolute"
             this.mapImage.style.left = rect.left + "px"
-            this.mapImage.style.top = rect.top + "px"
+            // this.mapImage.style.top = rect.top + "px"
             this.mapImage.setAttribute("usemap", "#imgMap" + this.name)
             this.map = document.createElement("map")
             this.map.setAttribute("name", "imgMap" + this.name)
@@ -767,12 +803,11 @@ plane.prototype = {
         }
 
 
-        this.div.style.width = Math.max(this.canvas.width, 250) + "px"
-        this.div.style.display = "inline-block"
+        // this.div.style.width = Math.max(this.canvas.width, 250) + "px"
+        // this.div.style.display = "inline-block"
 
         //updates canvas if needed
         if(updateCanvas){
-            log("Updating")
             this.div.appendChild(this.canvas)
         }
 
@@ -826,6 +861,9 @@ plane.prototype = {
         else{
             this.generate(true)
         }
+        window.onresize = function(){
+            this.generateBox(this)
+        }.bind(this)
         context.beginPath();
         context.moveTo(box_br.x + this.base_x, box_br.y + this.base_y)
         context.lineTo(box_tr.x + this.base_x, box_tr.y + this.base_y)
@@ -871,7 +909,6 @@ plane.prototype = {
         let halfTopX = ((box_tr.x + this.base_x) + (box_tl.x + this.base_x)) / 2
         let halfTopY = ((box_tr.y + this.base_y) + (box_tl.y + this.base_y)) / 2
         if(fill.hasOwnProperty("Normal")){
-            log("Normal")
             context.strokeStyle = "#FF0000";
         }
         context.beginPath();
@@ -897,11 +934,13 @@ plane.prototype = {
             boxArea.setAttribute("shape", "poly")
             boxArea.setAttribute("coords", (box_br.x + this.base_x) + "," + (box_br.y + this.base_y) + "," + (box_tr.x + this.base_x) + ',' + (box_tr.y + this.base_y) + "," + (box_tl.x + this.base_x) + "," + (box_tl.y + this.base_y) + "," + (box_bl.x + this.base_x) + "," + (box_bl.y + this.base_y))
             boxArea.setAttribute("alt", "box")
-            boxArea.setAttribute("href", "#")
+            boxArea.setAttribute("href", "javascript:void(0)")
             boxArea.style.display = "block"
             boxArea.onmouseenter = this.hoverObject.bind(this)
             boxArea.onmouseleave = this.unHoverObject.bind(this)
-            boxArea.onclick = this.boxClick.bind(this)
+            if(this.popup){
+                boxArea.onclick = this.boxClick.bind(this)
+            }
             this.map.appendChild(boxArea)
         }
         context.stroke()
@@ -968,7 +1007,7 @@ plane.prototype = {
             this.popupDiv.remove()
             this.popupDiv = null
         }
-        this.planeProperties["Width"] = width
+        this[this.name + "planeProperties"]["Width"] = width
     },
     setWidthPx: function(width, self=this){
         self.width = width
@@ -1126,11 +1165,9 @@ plane.prototype = {
     hoverForce(type){
         let fill = {}
         fill[type] = true
-        log(fill)
         this.generateBox(undefined, fill)
     },
     unHoverForce(){
-        log("unhover")
         this.generateBox()
     }
 }

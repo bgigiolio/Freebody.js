@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>JS Libraries</title>
+    <link rel="stylesheet" type="text/css" href="landing.css">
+    <script defer type="text/javascript" src='scripts/FBD_library.js'></script>
+    <script defer type="text/javascript" src='scripts/examples.js'></script>
+
+ </head>
+ <body>
+
+    <div class="nav">
+        <a href="/" class="button">Home</a>
+        <a href="/examples" class="button">Examples</a>
+        <a href="/documentation" class="button">Documentation</a>
+    </div>
+    <div class="info2" id="info2">
+        <h1 class="headerText">Freebody.js Examples</h1>
+        <h3 class="bodyText">
+            Freebody.js currently supports 2 types of diagrams:
+        </h3>
+        <br/>
+        <h3 class="bodyText">
+            Inclined Planes
+        </h3>
+    </div>
+    <div class="info" id="d2">
+        <h3 class="bodyText">
+            Flat Planes
+        </h3>
+    </div>
+    <div class="info" id="d3">
+        <h3 class="bodyText">
+            Both diagrams share much of the same functionality excluding those specific to the inclined plnae (Slope and plane highlighting).
+            Obviously, there is more functionality than just displaying, so lets dive into some examples.
+        </h3>
+        <br/>
+        <h3 class="bodyText">
+            Each diagram comes with built-in input generators for key styles. In the inclined plane these include the ability to set the slope and the height.
+            In the flat plane, the only built-in input is for width of the diagram. Below is an example for the inclined plane.
+        </h3>
+        <br/>
+        <h3 class="bodyText">
+            Feel free to mess around with the values. As a warning, extreme slopes and heights may make the model look odd!
+        </h3>
+    </div>
+    <div class="info" id="d4">
+        <h3 class="bodyText">
+            There is also the ability to add custom height and width labels. These fall into 2 categories:
+            <ul>
+                <li>Number labels: If the height is set using a number label, the width will be automatically calculated.
+                    You are also able to add units which will globally apply to the width too
+                </li>
+                <li>
+                    Text labels: If the height/width are set using a non-number, you can set custom values like "6x".
+                    If only the height is set, the width will be set using the formula width = height / tan(angle)
+                </li>
+            </ul>
+            Below is an example of text labels on an inclined plane:
+        </h3>
+    </div>
+    <div class="info" id="d5">
+        <h3 class="bodyText">
+            Finally, to see values of forces applied to the object, we can use the popup. To activate the popup, click on either the plane or the box
+        </h3>
+        <h3 class="bodyText">
+            (Try hovering over one of the forces in the popup after you select the box!)
+        </h3>
+    </div>
+
+ </body>
+
+</html>

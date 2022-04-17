@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>JS Libraries</title>
+    <link rel="stylesheet" type="text/css" href="landing.css">
+
+ </head>
+ <body>
+
+    <div class="nav">
+        <a href="/" class="button">Home</a>
+        <a href="/examples" class="button">Examples</a>
+        <a href="/documentation" class="button">Documentation</a>
+       </div>
+
+       <div class="info2" id="info2">
+         <h1 class="headerText">Documentation</h1>
+         <h3 class="bodyText">
+             Getting started: 
+         </h3>
+         <h3 class="bodyText">
+            To initialize a new diagram, we must run the following commands first:
+
+        </h3>
+         <h3 class="code">
+            //Make a new inclined plane with name "p1" <br/>
+            const FBD = new inclinedPlane("p1")<br/>
+            FBD.generate()<br/><br/>
+            //Make a new flat plane with name "p2" <br/>
+            const FBD2 = new plane("p2")<br/>
+            FBD2.generate()<br/><br/>
+         </h3>
+         <h3 class="bodyText">
+            This generates the diagram with no force object on it, meaning we just have a plane/inclined plane with the default
+            values for slope, height, and width.
+        </h3>
+        <br/>
+        <h3 class="bodyText">
+         To add force objects, use the following command:
+         </h3>
+         <h3 class="code">
+            FBD.addForceObject("box") <br/>
+            FBD.generateBox()
+         </h3>
+         <br/>
+         <h1 class="headerText">Functions for both diagram types</h1>
+         <h2 class="bodyText">
+            generate()
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>None</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            The generate function renders the diagram according to the current set parameters.
+         </h3>
+         <h3 class="bodyText">
+            Note: if you have generated a box object on your model, use generateBox() instead!
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            generateBox()
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>None</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            The generateBox function renders the diagram according to the current set parameters.
+         </h3>
+         <h3 class="bodyText">
+            Note: if you do not want a force object, do not use generateBox!
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            addForceObject(Object)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>Object: String</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Adds details to allow for generation. Object = "box" will add a box to the diagram.
+         </h3>
+         <h3 class="bodyText">
+            Note: The only implemented objects are "box" and "square" which are both the same!
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            setLeftOffset(offset)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>offset: Number</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Moves the diagram offset pixels to the right of the canvas.
+         </h3>
+         <h3 class="bodyText">
+            Note: This also changes the size of the canvas.
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            setUpOffset(offset)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>offset: Number</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Moves the diagram offset pixels towards the bottom of the canvas.
+         </h3>
+         <h3 class="bodyText">
+            Note: This also changes the size of the canvas.
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            setMass(mass, unit)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>mass: Any</li>
+               <li>unit: String (Optional)</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Adds/updates the mass attribute of the force object. If mass and unit are set, the popup will display the mass as:
+             "mass unit" (i.e. 45 kg). If unit is not set, the mass will be set to just the mass value, this is useful for setting the 
+             mass equal to a variable
+         </h3>
+         <h3 class="bodyText">
+            Note: This will only be displayed in the popup
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            setForces(Forces)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>Forces: Object</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Sets any of the preset forces [Normal, Gravity, Right, Left, Down] to the assigned value. The passed in object must be in the form: <br/>
+            {"Normal": "Value", "Down": "Value", ...} <br/>
+            You are allowed to set any forces you choose among the preset forces offered
+         </h3>
+         <h3 class="bodyText">
+            Note: This will only be displayed in the popup
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            allowPopup()
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>None</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            This allows the popup to be created when clicking on the plane (only for inclined plane) and the force object
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            disablePopup()
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>None</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            This stops the popup from being created when clicking on the plane (only for inclined plane) and the force object
+         </h3>
+
+
+
+         <br/>
+         <h1 class="headerText">Functions only in inclinedPlane</h1>
+         <br/>
+         <h2 class="bodyText">
+            setHeightPx(height)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>height: Number</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Sets the pixel height of the plane
+         </h3>
+         <h3 class="bodyText">
+            Note: This MUST be greater than 0, and should be greater than 50
+         </h3>
+         
+
+         <br/>
+         <h2 class="bodyText">
+            setHeight(height, unit)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>Height: Any</li>
+               <li>unit: String</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            sets the height label to the value given
+         </h3>
+
+         
+
+     </div>
+ </body>
+<!-- setHeight -->
+<!-- setSlopeAngle -->
+<!-- setPlaneAttribute -->
+<!-- setWidth -->
+<!-- allowSlopeInput -->
+<!-- allowHeightInput -->
+</html>
