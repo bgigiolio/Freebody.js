@@ -70,6 +70,7 @@ async function demo() {
     FBD5.setMass(40, "kg")
     FBD5.setForces({"Normal": "5N", "Right" : "3N", "Left" : "1N", "Down": "2N", "Gravity": "mg"})
     FBD5.addForceObject("box")
+    FBD5.setHoverColor("#49eb34")
     FBD5.generateBox()
     let d5 = document.getElementById("d5")
     // let popup = document.getElementById("p5Popup")

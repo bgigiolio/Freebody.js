@@ -198,6 +198,21 @@
             This stops the popup from being created when clicking on the plane (only for inclined plane) and the force object
          </h3>
 
+         <br/>
+         <h2 class="bodyText">
+            setHoverColor(color)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>color: String</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Sets the hover color to the given color. The color must be a valid CSS color (to be safe use the hex format: #xxxxxx)
+         </h3>
+         
+
 
 
          <br/>
@@ -232,17 +247,93 @@
             </ul>
          </h3>
          <h3 class="bodyText">
-            sets the height label to the value given
+            Sets the height label to the value given
          </h3>
 
+         <br/>
+         <h2 class="bodyText">
+            setSlopeAngle(slopeAngle)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>slopeAngle: Number</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Sets the angle of the inclined plane
+         </h3>
+         <h3 class="bodyText">
+            Note: This MUST be greater than 12 and less than 90
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            setPlaneAttribute(attribute, value)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>attribute: value</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Sets the given attribute of the plane equal to the value. Unless a protected attribute is being set (height, width, slopeAngle), this 
+            will simply add this as text in the popup
+         </h3>
+         <h3 class="bodyText">
+            Note: This only affects the popup!
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            setWidth(width)
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>width: String</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Sets a custom width value. This is a string displayed under the inclined plane
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            allowSlopeInput()
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>none</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Generates an input field and button for setting the slope of the diagram.
+         </h3>
+         <h3 class="bodyText">
+            Note: This text field enforces that the slope MUST be greater than 12 and less than 90
+         </h3>
+
+         <br/>
+         <h2 class="bodyText">
+            allowHeightInput()
+         </h2>
+         <h3 class="bodyText">
+            Params: <br/>
+            <ul class="ul">
+               <li>none</li>
+            </ul>
+         </h3>
+         <h3 class="bodyText">
+            Generates an input field and button for setting the height of the diagram.
+         </h3>
+         <h3 class="bodyText">
+            Note: This text field enforces that the height must be greater than 50.
+         </h3>
          
 
      </div>
  </body>
-<!-- setHeight -->
-<!-- setSlopeAngle -->
-<!-- setPlaneAttribute -->
-<!-- setWidth -->
-<!-- allowSlopeInput -->
-<!-- allowHeightInput -->
 </html>

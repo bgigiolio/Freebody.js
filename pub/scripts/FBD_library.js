@@ -539,6 +539,14 @@ inclinedPlane.prototype = {
         return val * (Math.PI / 180)
     },
 
+    setHoverColor(color){
+        const s = new Option().style;
+        s.color = color;
+        if(s.color !== ''){
+            this.hoverColor = color
+        }
+    },
+
     hoverPlane(){//internal helper
         this.generate(this.slopeAngle, this.height, true, false)
         if(this.forceObject == "box"){
@@ -1169,7 +1177,15 @@ plane.prototype = {
     },
     unHoverForce(){
         this.generateBox()
-    }
+    },
+    setHoverColor(color){
+        const s = new Option().style;
+        s.color = color;
+        if(s.color !== ''){
+            this.hoverColor = color
+        }
+    },
+
 }
 
 function drawArrow(context, fromx, fromy, tox, toy, headlen=10){ //Adapted from: https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag 
