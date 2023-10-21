@@ -1,4 +1,4 @@
-# Landing page: https://freebody.herokuapp.com/
+# Landing page: http://freebody.bgigiolio.com/
 
 ### Getting started:
 
@@ -22,4 +22,4 @@ FBD2.generate()
 FBD.addForceObject("box")  
 FBD.generateBox()
 # For further documentation, please visit: 
-## https://freebody.herokuapp.com/documentation
+## http://freebody.bgigiolio.com/documentation
