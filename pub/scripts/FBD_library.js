@@ -106,7 +106,7 @@ inclinedPlane.prototype = {
         this.fontSize = Math.min(width, height) * .09
         context.font = this.fontSize + "px Arial";
         //Angle label
-        this[this.name + "planeProperties"].Angle =  "30" + "\u00b0";
+        this[this.name + "planeProperties"].Angle =  this.slopeAngle + "\u00b0";
         context.fillText(this[this.name + "planeProperties"].Angle, width * (3/4) + 2, height - 2);
         //Width label
         if(this[this.name + "planeProperties"].hasOwnProperty("Width")){
